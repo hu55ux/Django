@@ -1,0 +1,117 @@
+================================================================================
+                    MAIN.PY KODUNUN ƏTRAFLI İZAHI VƏ SƏNƏDLƏŞDİRİLMƏSİ
+================================================================================
+
+Bu sənəddə `main.py` faylında reallaşdırılmış hər bir sinif (class), metod, 
+magic (dunder) metod və funksiyanın təyinatı və iş prinsipi ətraflı izah olunmuşdur.
+
+--------------------------------------------------------------------------------
+1. BAZA SİNİF (BASE CLASS): Character
+--------------------------------------------------------------------------------
+Personajlar üçün baza sinfidir. Bütün digər personaj tipləri bu sinifdən irsiyyət 
+(inheritance) alır.
+
+• __init__(self, name: str, health: int, attack_power: int)
+  - Təyinatı: Obyekt yaradılarkən işə düşən konstruktor metoddur.
+  - Parametrlər: 
+    * name: Personajın adı.
+    * health: Personajın sağlamlıq xalı (HP). 0-dan kiçik ola bilməz.
+    * attack_power: Personajın baza hücum gücü.
+
+• take_damage(self, amount: int) -> int
+  - Təyinatı: Personajın zərər almasını təmin edir.
+  - İş prinsipi: Daxil olan zərər qədər sağlamlıq xalını azaldır. Əgər sağlamlıq 0-a 
+    enərsə, məğlub olduğunu ekrana çıxarır. Qalan zərər dəyərini qaytarır.
+
+• attack(self, target: Character) -> None
+  - Təyinatı: Başqa bir personaja baza hücumu edir.
+  - İş prinsipi: Personaj sağdırsa və hədəf də sağdırsa, hədəfin `take_damage` 
+    metodunu çağıraraq ona zərər vurur.
+
+• get_info(self) -> str
+  - Təyinatı: Personajın cari vəziyyəti haqqında mətni məlumat hazırlayır.
+
+--- Character Sinfinin Magic (Dunder) Metodları ---
+
+• __str__(self) -> str
+  - Təyinatı: `print(personaj)` çağırıldıqda və ya `str(personaj)` edildikdə işləyir. 
+    Personaj haqqında məlumatı oxunaqlı mətni formatda qaytarır.
+
+• __bool__(self) -> bool
+  - Təyinatı: Personajın sağ olub-olmadığını yoxlayır (`bool(personaj)`).
+  - İş prinsipi: `health > 0` olarsa `True`, aksi halda `False` qaytarır.
+
+• __len__(self) -> int
+  - Təyinatı: `len(personaj)` çağırıldıqda personajın ədədi xarakteristikasını qaytarır.
+  - İş prinsipi: Personajın cari sağlamlıq xalını (`self.health`) qaytarır.
+
+• __lt__(self, other: Character) -> bool
+  - Təyinatı: İki personajı `<` (kiçikdir) operatoru ilə müqayisə edir.
+  - İş prinsipi: Öz sağlamlığı digər personajın sağlamlığından azdırsa `True` qaytarır.
+
+• __eq__(self, other: object) -> bool
+  - Təyinatı: İki personajı `==` (bərabərdir) operatoru ilə yoxlayır.
+  - İş prinsipi: Adları, sağlamlıqları və hücum gücləri eynidirsə `True` qaytarır.
+
+• __add__(self, other) -> Team
+  - Təyinatı: İki personajı `+` operatoru ilə birləşdirir.
+  - İş prinsipi: İki personajı birləşdirərək yeni bir `Team` (Komanda) obyekti yaradır.
+
+
+--------------------------------------------------------------------------------
+2. TÖRƏMƏ SİNİFLƏR (INHERITANCE & POLYMORPHISM)
+--------------------------------------------------------------------------------
+
+A) Warrior (Döyüşçü Sinfi)
+  `Character` sinfindən irsiyyət alır. 
+  - Əlavə atribut: `armor` (Zireh dəyəri).
+  - take_damage(self, amount): Zirehi (armor) sayəsində daxil olan zərəri azaldır.
+  - attack(self, target): Baltası ilə xüsusi ağır zərbə endirir (+5 bonus zərər).
+
+B) Mage (Sehrbaz Sinfi)
+  `Character` sinfindən irsiyyət alır.
+  - Əlavə atribut: `mana` (Sehr gücü).
+  - attack(self, target): Manası (>= 10) varsa, 10 Mana xərcləyərək 2x zərər verən 
+    "Fireball" sehrini atır. Manası bitdikdə adi sehrli çubuq hücumu edir.
+
+C) Archer (Oxçu Sinfi)
+  `Character` sinfindən irsiyyət alır.
+  - Əlavə atribut: `arrows` (Ox sayısı).
+  - attack(self, target): Oxu (> 0) varsa, 1 ox xərcləyərək məsafəli hücum edir. 
+    Ox bitdikdə əlbəyaxa zərbə endirir.
+
+
+--------------------------------------------------------------------------------
+3. KOMANDA SİNFİ: Team
+--------------------------------------------------------------------------------
+• __init__(self, name: str, members: list[Character])
+  - Komandanın adını və tərkibindəki personajların siyahısını saxlayır.
+• __add__(self, other)
+  - Komandaya `+` operatoru vasitəsilə yeni personaj və ya digər komanda əlavə edir.
+• __str__(self)
+  - Komandanın adı və bütün üvlərinin adlarını ekrana çıxarır.
+
+
+--------------------------------------------------------------------------------
+4. KÖMƏKÇİ VƏ İNTERAKTİV İDARƏETMƏ FUNKSİYALARI
+--------------------------------------------------------------------------------
+
+• clear_screen(title: str = "MAIN MENU") -> None
+  - Təyinatı: Ekranı təmizləyir (`cls` və ya `clear`) və yuxarı hissədə standart 
+    səliqəli başlıq (Header) panelini göstərir.
+
+• get_user_input(prompt: str) -> str
+  - Təyinatı: İstifadəçidən daxiletmə alır. Əgər istifadəçi '0', 'b', 'esc', 'back' 
+    və ya 'cancel' yazarsa, "ESC" siqnalı qaytararaq dərhal əsas menyuya qayıtmağı təmin edir.
+
+• display_character_list(characters: list[Character]) -> None
+  - Təyinatı: Mövcud personajların nömrələnmiş siyahısını formatlı şəkildə ekrana çıxarır.
+
+• pause_prompt() -> None
+  - Təyinatı: Əməliyyat bitdikdən sonra istifadəçinin nəticəni oxuması üçün 
+    "Enter düyməsini sıxın" gözləməsini təmin edir.
+
+• main_interactive() -> None
+  - Təyinatı: Proqramın əsas dövrəsidir (while loop). Bütün menyu seçimlərini (1-6) 
+    və çıxış mexanizmini idarə edir.
+================================================================================
