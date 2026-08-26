@@ -324,17 +324,60 @@ TEMPLATES = [
 - `{{ note.created_at|date:"j F Y" }}` : Tarixi formatlayır (məs: 24 August 2026).
 - `{{ note.body|truncatechars:100 }}` : Mətni verilən simvol sayına qədər kəsir.
 
-7.4. VIEW-DA `render()` İSTİFADƏSİ
------------------------------------
-`render(request, template_name, context, status=200)`
-Funksiyası cavab olaraq HTML şablonunu verilmiş context (lüğət) məlumatları ilə generator edib HttpResponse qaytarır.
+7.4. VIEW-DA `render()` İSTİFADƏSİ VƏ ARGUMENTLƏRİ
+---------------------------------------------------
+`render(request, template_name, context=None, content_type=None, status=None, using=None)`
 
-Nümunə (`notes/views.py`):
-def note_detail(request: HttpRequest, note_id: int) -> HttpResponse:
-    note = data.get_note(note_id)
-    if note is None:
-        return render(request, "notes/note_detail.html", {"note": None}, status=404)
-    return render(request, "notes/note_detail.html", {"note": note})
+Parametrlər:
+- `request`: Müraciət edən client-in `HttpRequest` obyekti (məcburi).
+- `template_name`: Şablonun nisbi yolu (`"notes/notes_list.html"`) (məcburi).
+- `context`: Şablona ötürülən məlumat lüğəti (dict) (məs: `{"notes": notes}`).
+- `status`: HTTP status kodu (məs: `200` OK, `404` Not Found, `403` Forbidden).
+- `content_type`: MIME cavab növü (susmaya görə `"text/html"`).
+- `using`: İstifadə olunacaq şablon mühərriki (Engine).
+
+7.5. `HttpRequest` OBYEKTİNİN BÜTÜN ƏSAS ATRİBUTLARI VƏ İMKANLARI
+------------------------------------------------------------------
+View funksiyasına birinci parametr kimi gələn `request: HttpRequest` obyektindən oxuya bildiyimiz məlumatlar:
+
+1. `request.method`:
+   - Sorğunun HTTP metodunu str olaraq qaytarır (`"GET"`, `"POST"`, `"PUT"`, `"DELETE"`).
+
+2. `request.GET`:
+   - URL-dəki query parametrlərini ehtiva edən QueryDict obyektidir (məs: `/notes/?tag=python` -> `request.GET.get("tag")`).
+
+3. `request.POST`:
+   - HTML forması vasitəsilə POST sorğusunda daxil edilən sahələri ehtiva edən QueryDict (məs: `request.POST.get("title")`).
+
+4. `request.FILES`:
+   - `multipart/form-data` formalardan yüklənən faylları ehtiva edən dictionary (məs: `request.FILES['avatar']`).
+
+5. `request.COOKIES`:
+   - İstifadəçinin brauzerindən gələn bütün Cookie-ləri ehtiva edən lüğət (məs: `request.COOKIES.get('csrftoken')`).
+
+6. `request.META`:
+   - Server və HTTP header məlumatlarını ehtiva edir (məs: `request.META.get('HTTP_USER_AGENT')`, `request.META.get('REMOTE_ADDR')`).
+
+7. `request.headers`:
+   - Case-insensitive (böyük-kiçik hərf fərqi olmayan) HTTP Header-lərə rahat çıxış verir (məs: `request.headers.get('User-Agent')`).
+
+8. `request.body`:
+   - HTTP sorğusunun xam (raw) byte məzmunu. REST API və ya JSON sorğularında `json.loads(request.body)` kimi istifadə edilir.
+
+9. `request.path` & `request.path_info`:
+   - Müraciət edilən tam URL yolunu (domain və query olmadan) qaytarır (məs: `/notes/create/`).
+
+10. `request.get_full_path()`:
+    - URL path və query parametrlərini birlikdə qaytarır (məs: `/notes/?tag=python&category=backend`).
+
+11. `request.build_absolute_uri()`:
+    - Domen adı daxil olmaqla tam Absolyut URL-i qaytarır (məs: `http://127.0.0.1:8000/notes/1/`).
+
+12. `request.user`:
+    - Aktiv avtentifikasiya olunmuş istifadəçi obyekti (`django.contrib.auth` aktiv olduqda).
+
+13. `request.session`:
+    - İstifadəçinin serverdəki sessiya məlumatları (dict kimi işlədilir: `request.session['theme'] = 'dark'`).
 """
 
 
