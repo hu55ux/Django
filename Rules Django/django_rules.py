@@ -166,7 +166,79 @@ class ProductAdmin(admin.ModelAdmin):
 
 
 # =============================================================================
-# 6. QISA XÜLASƏ ÇAPI
+# 6. CRUD ƏMƏLİYYATLARI VƏ VIEW MƏNTİQİ (KNOWLEDGE HUB PRAKTİKASI)
+# =============================================================================
+
+"""
+6.1. CRUD NƏDİR?
+----------------
+CRUD — Veb tətbiqlərdə verilənlər üzərində aparılan 4 əsas əməliyyatdır:
+- C (Create)  : Yeni obyekt yaradılması (`note_create` funksiyası).
+- R (Read)    : Obyektlərin siyahısı və detal baxışı (`notes_list`, `note_detail`).
+- U (Update)  : Mövcud obyektin redaktə olunması (`note_edit` funksiyası).
+- D (Delete)  : Obyektin sistemdən silinməsi (`note_delete` funksiyası).
+
+6.2. KRİTİK DJANGO FUNKSİYALARI VƏ ANLAYIŞLARI (KNOWLEDGE HUB İZAHI)
+---------------------------------------------------------------------
+
+1. `CSRF Qorunması (Cross-Site Request Forgery)`:
+   - POST formalarında təhlükəsizlik üçün Django hidden token tələb edir.
+   - `get_token(request)` vasitəsilə hidden input generasiya olunur:
+     `<input type='hidden' name='csrfmiddlewaretoken' value='...' />`
+
+2. `redirect("route_name", **kwargs)`:
+   - Forma göndərildikdən (POST) sonra istifadəçini başqa səhifəyə yönləndirir.
+   - Səhifənin yenilənməsi zamanı təkrarlanan POST sorğusunun (PRG Pattern) qarşısını alır.
+
+3. `reverse("route_name", kwargs={"id": 1})`:
+   - URL-in adından (`name="note_detail"`) istifadə edərək marşrut ünvanını (`/notes/1/`) 
+     dinamik olaraq generasiya edir. Kodda hardcode URL yazılışının qarşısını alır.
+
+4. `request.GET.get("param")` & Dinamik Filtrləmə:
+   - URL query parametrlərini (`/notes/?tag=python&category=backend`) oxuyur.
+   - Unikal tag və kateqoriya siyahısını toplayaraq HTML `<select>` dropdown menyuları 
+     vasitəsilə dinamik süzgəcləmə və sıfırlama (Reset) imkanı yaradır.
+
+5. `404 Not Found İdarəetməsi`:
+   - Müraciət edilən id üzrə obyekt tapılmadıqda status=404 kodu ilə istifadəçiyə 
+     səliqəli xəta mesajı qaytarılır.
+
+6.3. KNOWLEDGE HUB-DA VIEW STRUCTURE NÜMUNƏSİ:
+----------------------------------------------
+```python
+# UPDATE (Edit) View Nümunəsi:
+def note_edit(request: HttpRequest, note_id: int) -> HttpResponse:
+    note = data.get_note(note_id)
+    if note is None:
+        return HttpResponse("404 Not Found", status=404)
+
+    if request.method == "POST":
+        title = request.POST.get("title", "")
+        # Məlumatları yeniləyirik:
+        data.update_note(note_id, title=title, ...)
+        return redirect("note_detail", note_id=note_id)
+    
+    # GET: Doldurulmuş forma qaytarılır
+    return HttpResponse(render_edit_form(note))
+
+# DELETE View Nümunəsi:
+def note_delete(request: HttpRequest, note_id: int) -> HttpResponse:
+    note = data.get_note(note_id)
+    if note is None:
+        return HttpResponse("404 Not Found", status=404)
+
+    if request.method == "POST":
+        data.delete_note(note_id)
+        return redirect("notes_list")
+    
+    # GET: Təsdiqləmə kartı nümayiş olunur
+    return HttpResponse(render_delete_confirmation(note))
+```
+"""
+
+
+# =============================================================================
+# 7. QISA XÜLASƏ ÇAPI
 # =============================================================================
 
 def show_django_summary():
@@ -177,9 +249,11 @@ def show_django_summary():
     print("2. MVT Arxitekturası: Model (Database), View (Logic), Template (UI).")
     print("3. Əsas fayllar: settings.py (konfiqurasiya), urls.py (marşrutlar).")
     print("4. Admin Panel: createsuperuser -> admin.py-də ModelAdmin özəlləşdirməsi.")
-    print("5. İş axını: URL -> View -> Model/Data -> HttpResponse.")
+    print("5. CRUD & View Məntiqi: Create, Read, Update, Delete operatsiyaları.")
+    print("6. Təhlükəsizlik & Yönləndirmə: CSRF token, redirect, reverse, request.GET.")
     print("=" * 65)
 
 
 if __name__ == "__main__":
     show_django_summary()
+
