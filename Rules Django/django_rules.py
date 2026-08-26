@@ -315,14 +315,38 @@ TEMPLATES = [
 7. `{% with total=notes|length %}`:
    - Şablon daxilində müvəqqəti dəyişən yaradır.
 
-7.3. ƏSAS TEMPLATE FİLTRLƏRİ (FILTERS)
----------------------------------------
-- `{{ note.title|title }}` : İlk hərfləri böyük edir.
-- `{{ note.category|upper }}` : Mətni tam böyük hərfə çevirir.
-- `{{ note.category|capfirst }}` : Yalnız ilk hərfi böyük edir.
-- `{{ notes|length }}` : Siyahının uzunluğunu qaytarır.
-- `{{ note.created_at|date:"j F Y" }}` : Tarixi formatlayır (məs: 24 August 2026).
-- `{{ note.body|truncatechars:100 }}` : Mətni verilən simvol sayına qədər kəsir.
+7.3. ƏSAS TEMPLATE FİLTRLƏRİ (FILTERS VƏ FUNKSİYALARI)
+-------------------------------------------------------
+Template-də dəyişənləri formatlamaq üçün `{{ variable|filter_name }}` sintaksisindən istifadə olunur.
+
+a) **Mətn və Registr Filtrləri:**
+   - `|upper` : Mətni tam böyük hərflərə çevirir (`"django"|upper` ➡️ `"DJANGO"`).
+   - `|lower` : Mətni tam kiçik hərflərə çevirir (`"DJANGO"|lower` ➡️ `"django"`).
+   - `|title` : Hər bir sözün ilk hərfini böyük edir (`"django views"|title` ➡️ `"Django Views"`).
+   - `|capfirst` : Yalnız cümlənin/mətnin ƏN İLK hərfini böyük edir (`"backend"|capfirst` ➡️ `"Backend"`).
+
+b) **Siyahı və Ölçü Filtrləri:**
+   - `|length` : Siyahının, lüğətin (dict) və ya mətnin uzunluğunu qaytarır (`notes|length` ➡️ `10`).
+   - `|first` : Siyahının ilk elementini qaytarır (`notes|first`).
+   - `|last` : Siyahının sonuncu elementini qaytarır (`notes|last`).
+   - `|join:", "` : Siyahı elementlərini verilmiş simvol ilə birləşdirir (`tags|join:", "` ➡️ `"python, django"`).
+   - `|slice:":3"` : Siyahını və ya mətni kəsir (`notes|slice:":3"` ➡️ ilk 3 element).
+
+c) **Mətn Kəsmə və Qısaltma Filtrləri:**
+   - `|truncatechars:N` : Mətni N simvol sayından sonra kəsib sonuna `...` əlavə edir (`body|truncatechars:100`).
+   - `|truncatewords:N` : Mətni N söz sayından sonra kəsir (`body|truncatewords:10`).
+   - `|striptags` : Mətndəki bütün HTML teqlərini təmizləyir (`"<p>Test</p>"|striptags` ➡️ `"Test"`).
+
+d) **Təhlükəsizlik Filtrləri:**
+   - `|safe` : HTML kodunun escape olunmasını əngəlləyir, brauzerdə daxili HTML kimi nümayiş etdirir (`html_code|safe`).
+
+e) **Tarix və Əvəzetmə Filtrləri:**
+   - `|default:"dəyər"` : Dəyişən `None`, boş və ya `False` olduqda alternativi göstərir (`tag|default:"misc"`).
+   - `|default_if_none:"dəyər"` : Yalnız dəyişən `None` olduqda əvəzedici göstərir.
+   - `|date:"format"` : Tarix və vaxtı göstərilən formata salır:
+     • `"d/m/Y"` ➡️ `26/08/2026`
+     • `"j F Y"` ➡️ `26 August 2026`
+     • `"d.m.Y H:i"` ➡️ `26.08.2026 15:30`
 
 7.4. VIEW-DA `render()` İSTİFADƏSİ VƏ ARGUMENTLƏRİ
 ---------------------------------------------------
