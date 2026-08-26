@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}About - {{ project_name }}{% endblock %}
+
+{% block content %}
+    <h1>About {{ project_name }}</h1>
+
+    <p>
+        Knowledge Hub is a simple Django web application designed
+        to store and organize useful notes and learning materials.
+    </p>
+
+    <p>
+        Users can browse notes, view detailed information,
+        and explore content by tags and categories.
+    </p>
+
+    <p class="muted">
+        Author: {{ author }}
+    </p>
+{% endblock %}

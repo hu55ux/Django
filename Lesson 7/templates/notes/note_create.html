@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Create Note{% endblock %}
+
+{% block content %}
+    <h1>Create New Note</h1>
+
+    {% if err %}
+        <p style="color:#dc2626; font-weight:600; margin-bottom:12px;">{{ err }}</p>
+    {% endif %}
+
+    <form method="POST" action="{% url 'note_create' %}" class="note-form">
+        {% csrf_token %}
+
+        <p>
+            <label>Title *</label>
+            <input type="text" name="title" placeholder="Enter note title..." required>
+        </p>
+
+        <p>
+            <label>Text</label>
+            <textarea name="body" rows="5" placeholder="Enter note content..."></textarea>
+        </p>
+
+        <p>
+            <label>Tag</label>
+            <input type="text" name="tag" placeholder="e.g. python, django">
+        </p>
+
+        <p>
+            <label>Category</label>
+            <input type="text" name="category" placeholder="e.g. backend, frontend">
+        </p>
+
+        <div style="margin-top: 24px; display: flex; gap: 12px; align-items: center;">
+            <button type="submit">Create Note</button>
+            <a href="{% url 'notes_list' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+{% endblock %}

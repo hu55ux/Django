@@ -273,7 +273,73 @@ def note_delete(request: HttpRequest, note_id: int) -> HttpResponse:
 
 
 # =============================================================================
-# 7. QISA XÜLASƏ ÇAPI
+# 7. DJANGO TEMPLATES ARXİTEKTURASI VƏ İRSİLİK (LESSON 7 PRAKTİKASI)
+# =============================================================================
+
+"""
+7.1. TEMPLATES NƏDİR VƏ STRUKTURU
+----------------------------------
+Django Templates — Python məntiqi ilə HTML interfeysini ayıran dinamik şablonlaşdırma sistemidir.
+Fayllar adətən layihənin kök qovluğundakı `templates/` papkasında saxlanılır.
+
+`settings.py` Konfiqurasiyası:
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates'],
+        'APP_DIRS': True,
+        ...
+    }
+]
+
+7.2. ƏSAS TEMPLATE TEQLƏRİ (TAGS) VƏ İRSİLİK (INHERITANCE)
+----------------------------------------------------------
+1. `{% extends "base.html" %}`:
+   - Ana HTML şablonundan irsilik alır. Şablon faylının ƏN ÜST xəttində yazılmalıdır.
+
+2. `{% block content %} ... {% endblock %}`:
+   - Ana şablonda (`base.html`) yer ayrılır, alt şablonlar həmin hissəni öz məzmunu ilə doldurur.
+
+3. `{% include "notes/_page_header.html" %}`:
+   - Təkrar istifadə olunan komponenti (məsələn, Navbar, Header, Footer) şablona daxil edir.
+
+4. `{% url 'route_name' arg1 %}`:
+   - URL-i dinamik çağırır (`<a href="{% url 'note_detail' note.id %}">`).
+
+5. `{% csrf_token %}`:
+   - Formanın daxilində POST təhlükəsizlik tokeni yerləşdirir.
+
+6. `{% for ... in ... %}` & `{% empty %}`:
+   - Siyahı boş olduqda `{% empty %}` bloku avtomatik işə düşür.
+
+7. `{% with total=notes|length %}`:
+   - Şablon daxilində müvəqqəti dəyişən yaradır.
+
+7.3. ƏSAS TEMPLATE FİLTRLƏRİ (FILTERS)
+---------------------------------------
+- `{{ note.title|title }}` : İlk hərfləri böyük edir.
+- `{{ note.category|upper }}` : Mətni tam böyük hərfə çevirir.
+- `{{ note.category|capfirst }}` : Yalnız ilk hərfi böyük edir.
+- `{{ notes|length }}` : Siyahının uzunluğunu qaytarır.
+- `{{ note.created_at|date:"j F Y" }}` : Tarixi formatlayır (məs: 24 August 2026).
+- `{{ note.body|truncatechars:100 }}` : Mətni verilən simvol sayına qədər kəsir.
+
+7.4. VIEW-DA `render()` İSTİFADƏSİ
+-----------------------------------
+`render(request, template_name, context, status=200)`
+Funksiyası cavab olaraq HTML şablonunu verilmiş context (lüğət) məlumatları ilə generator edib HttpResponse qaytarır.
+
+Nümunə (`notes/views.py`):
+def note_detail(request: HttpRequest, note_id: int) -> HttpResponse:
+    note = data.get_note(note_id)
+    if note is None:
+        return render(request, "notes/note_detail.html", {"note": None}, status=404)
+    return render(request, "notes/note_detail.html", {"note": note})
+"""
+
+
+# =============================================================================
+# 8. QISA XÜLASƏ ÇAPI
 # =============================================================================
 
 def show_django_summary():
@@ -286,9 +352,11 @@ def show_django_summary():
     print("4. Admin Panel: createsuperuser -> admin.py-də ModelAdmin özəlləşdirməsi.")
     print("5. CRUD & View Məntiqi: Create, Read, Update, Delete operatsiyaları.")
     print("6. Təhlükəsizlik & Yönləndirmə: CSRF token, redirect, reverse, request.GET.")
+    print("7. Django Templates: {% extends %}, {% block %}, render(), teqlər və filtrlər.")
     print("=" * 65)
 
 
 if __name__ == "__main__":
     show_django_summary()
+
 

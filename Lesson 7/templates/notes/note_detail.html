@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}{{ note.title|title }}{% endblock %}
+
+{% block content %}
+    {% if note %}
+        <h1>{{ note.title|title }}</h1>
+        <p class="muted">
+            ID: {{ note.id }} | Tag: {{ note.tag }} | Category: {{ note.category }}
+        </p>
+
+        <p style="font-size: 1.1rem; line-height: 1.7; margin: 20px 0;">
+            {{ note.body }}
+        </p>
+
+        <div style="display: flex; gap: 12px; margin-top: 24px;">
+            <a href="{% url 'note_edit' note.id %}" class="btn">Edit Note</a>
+            <a href="{% url 'note_delete' note.id %}" class="btn btn-danger">Delete Note</a>
+            <a href="{% url 'notes_list' %}" class="btn btn-secondary">Return to Notes List</a>
+        </div>
+    {% else %}
+        <h1>Note Not Found</h1>
+        <p class="muted">The requested note does not exist.</p>
+        <p><a href="{% url 'notes_list' %}" class="btn btn-secondary">Return to Notes List</a></p>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Notes List{% endblock %}
+
+{% block content %}
+    <h1>Notes List</h1>
+
+    <form method="GET" action="{% url 'notes_list' %}" class="filter-form" style="margin-bottom: 24px;">
+        <h3 style="margin-top: 0; margin-bottom: 12px;">Filter Notes</h3>
+        
+        <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 180px;">
+                <label style="margin-top: 0;">Tag</label>
+                <select name="tag">
+                    <option value="">-- All Tags --</option>
+                    {% for t in all_tags %}
+                        <option value="{{ t }}" {% if selected_tag == t %}selected{% endif %}>{{ t|capfirst }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="flex: 1; min-width: 180px;">
+                <label style="margin-top: 0;">Category</label>
+                <select name="category">
+                    <option value="">-- All Categories --</option>
+                    {% for c in all_categories %}
+                        <option value="{{ c }}" {% if selected_category == c %}selected{% endif %}>{{ c|capfirst }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <p style="margin-top: 16px;">
+            <button type="submit">Filter</button>
+            <a href="{% url 'notes_list' %}" class="btn btn-secondary" style="margin-left: 8px; font-size: 0.9rem; padding: 9px 16px;">Reset</a>
+        </p>
+    </form>
+
+    <p style="margin-top: 24px;">
+        <a href="{% url 'note_create' %}" class="btn">
+            + Create Note
+        </a>
+    </p>
+
+    <ul class="notes">
+        {% for note in notes %}
+            <li>
+                <a href="{% url 'note_detail' note.id %}">
+                    {{ note.title }}
+                </a>
+                <span class="muted">
+                    (tag: {{ note.tag }}, category:
+                    {% if note.category == "backend" %}
+                        <span class="badge badge-backend">{{ note.category|upper }}</span>
+                    {% elif note.category == "database" %}
+                        <span class="badge badge-database">{{ note.category|upper }}</span>
+                    {% elif note.category == "frontend" %}
+                        <span class="badge badge-frontend">{{ note.category|upper }}</span>
+                    {% else %}
+                        <span class="badge badge-default">{{ note.category|upper }}</span>
+                    {% endif %})
+                </span>
+            </li>
+        {% empty %}
+            <li>No notes found matching your criteria.</li>
+        {% endfor %}
+    </ul>
+
+    {% with total=notes|length %}
+        <p class="muted">Total notes displayed: {{ total }}</p>
+    {% endwith %}
+{% endblock %}
