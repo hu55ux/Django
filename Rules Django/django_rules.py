@@ -226,6 +226,18 @@ CRUD — Veb tətbiqlərdə verilənlər üzərində aparılan 4 əsas əməliyy
    - Müraciət edilən id üzrə obyekt tapılmadıqda status=404 kodu ilə istifadəçiyə 
      səliqəli xəta mesajı qaytarılır.
 
+6. `escape()` (`from django.utils.html import escape`):
+   - **XSS (Cross-Site Scripting)** təhlükəsizlik hücumlarının qarşısını alır.
+   - İstifadəçinin daxil etdiyi xüsusi HTML/JS simvollarını (`<`, `>`, `&`, `"`, `'`) 
+     təhlükəsiz HTML entity-lərinə (`&lt;`, `&gt;`) çevirir. Zərərli script-lərin icrasını 
+     və sayt dizaynının pozulmasını əngəlləyir.
+
+7. `html_shell(title, body)` Layout Funksiyası:
+   - **DRY (Don't Repeat Yourself)** prinsipini təmin edir.
+   - Hər bir view-da `<!DOCTYPE html>`, `<head>`, `<style>`, `<nav>` kimi ümumi HTML 
+     skeletini dəfələrlə təkrar yazmaq yerinə, bütün view-ları vahid dizayn çərçivəsində 
+     birləşdirən köməkçi wrapper funksiyadır.
+
 6.3. KNOWLEDGE HUB-DA VIEW STRUCTURE NÜMUNƏSİ:
 ----------------------------------------------
 ```python
