@@ -6,6 +6,7 @@ from django.http import HttpResponse, HttpRequest
 
 from . import data
 
+
 def html_shell(title: str, body: str) -> str:
     safe_title = escape(title)
 
@@ -183,6 +184,56 @@ def html_shell(title: str, body: str) -> str:
             transform: scale(0.98);
         }}
 
+        .btn-danger {{
+            background: #dc2626;
+            color: white;
+        }}
+
+        .btn-danger:hover {{
+            background: #b91c1c;
+        }}
+
+        .btn-secondary {{
+            background: #f3f4f6;
+            color: #374151;
+            text-decoration: none;
+            display: inline-block;
+            padding: 10px 18px;
+            border-radius: 7px;
+            font-weight: 600;
+            border: 1px solid #d1d5db;
+            transition: background 0.2s;
+        }}
+
+        .btn-secondary:hover {{
+            background: #e5e7eb;
+            color: #111827;
+            text-decoration: none;
+        }}
+
+        .delete-card {{
+            background: #ffffff;
+            padding: 32px;
+            border-radius: 12px;
+            border: 1px solid #fee2e2;
+            box-shadow: 0 4px 16px rgba(220, 38, 38, 0.08);
+            max-width: 550px;
+        }}
+
+        .delete-card h1 {{
+            color: #dc2626;
+            font-size: 1.5rem;
+            margin-top: 0;
+        }}
+
+        .note-preview {{
+            background: #fcfcfd;
+            border-left: 4px solid #dc2626;
+            padding: 12px 16px;
+            margin: 16px 0 24px;
+            border-radius: 0 8px 8px 0;
+        }}
+
         .actions {{
             display: flex;
             gap: 10px;
@@ -238,20 +289,22 @@ def html_shell(title: str, body: str) -> str:
 </html>
 """
 
-# CSRF -> Cross-Site Request Forgery
-def _csrf_field(request:HttpRequest)-> str:
+
+def _csrf_field(request: HttpRequest) -> str:
     token = get_token(request)
-    return f"<input type='hidden' name='csrfmiddlewaretoken' value='{escape(token)}'/input>"
+    return f"<input type='hidden' name='csrfmiddlewaretoken' value='{escape(token)}'>"
+
 
 def home(request: HttpRequest) -> HttpResponse:
-    body= f"""
-    <h1> Knowledge Hub </h1>
-    <p>Welcome!!!</p>
+    body = f"""
+    <h1>Knowledge Hub</h1>
+    <p>Welcome to Knowledge Hub!</p>
     <p class='muted'>
-        <a href="{escape(reverse('notes_list'))}">Notes list</a>
+        <a href="{escape(reverse('notes_list'))}">Go to Notes list</a>
     </p>
     """
-    return HttpResponse(html_shell("Knowledge Hub - home", body))
+    return HttpResponse(html_shell("Knowledge Hub - Home", body))
+
 
 def about(request: HttpRequest) -> HttpResponse:
     body = """
@@ -272,7 +325,8 @@ def about(request: HttpRequest) -> HttpResponse:
             URL routing, HTTP requests and responses.
         </p>
     """
-    return HttpResponse(html_shell("Knowledge About - home", body))
+    return HttpResponse(html_shell("About Knowledge Hub", body))
+
 
 def notes_list(request: HttpRequest) -> HttpResponse:
     raw_tag = request.GET.get("tag")
@@ -282,25 +336,16 @@ def notes_list(request: HttpRequest) -> HttpResponse:
 
     if raw_tag:
         tag_filter = raw_tag.strip().lower()
-        notes = [
-            n for n in notes
-            if n["tag"].lower() == tag_filter
-        ]
+        notes = [n for n in notes if n["tag"].lower() == tag_filter]
 
     if raw_category:
         category_filter = raw_category.strip().lower()
-        notes = [
-            n for n in notes
-            if n["category"].lower() == category_filter
-        ]
+        notes = [n for n in notes if n["category"].lower() == category_filter]
 
     items: list[str] = []
 
     for note in notes:
-        url = reverse(
-            "note_detail",
-            kwargs={"note_id": note["id"]}
-        )
+        url = reverse("note_detail", kwargs={"note_id": note["id"]})
 
         items.append(
             f"""
@@ -310,10 +355,7 @@ def notes_list(request: HttpRequest) -> HttpResponse:
                 </a>
 
                 <span class="muted">
-                    (
-                    tag: {escape(note["tag"])},
-                    category: {escape(note["category"])}
-                    )
+                    (tag: {escape(note["tag"])}, category: {escape(note["category"])})
                 </span>
             </li>
             """
@@ -331,35 +373,18 @@ def notes_list(request: HttpRequest) -> HttpResponse:
             <h3>Filters</h3>
 
             <label>
-                <input
-                    type="checkbox"
-                    name="tag"
-                    value="python"
-                    {tag_checked}
-                >
+                <input type="checkbox" name="tag" value="python" {tag_checked}>
                 Tag: Python
             </label>
 
             <label>
-                <input
-                    type="checkbox"
-                    name="category"
-                    value="backend"
-                    {category_checked}
-                >
+                <input type="checkbox" name="category" value="backend" {category_checked}>
                 Category: Backend
             </label>
 
-            <p>
-                <button type="submit">
-                    Filter
-                </button>
-
-                <a href="{reset_url}">
-                    <button type="button">
-                        Reset
-                    </button>
-                </a>
+            <p style="margin-top: 16px;">
+                <button type="submit">Filter</button>
+                <a href="{reset_url}" class="btn-secondary" style="margin-left: 8px; font-size: 0.9rem; padding: 8px 14px;">Reset</a>
             </p>
 
         </form>
@@ -370,9 +395,9 @@ def notes_list(request: HttpRequest) -> HttpResponse:
 
         {filters}
 
-        <p>
-            <a href="{create_url}">
-                Create Note
+        <p style="margin-top: 24px;">
+            <a href="{create_url}" style="display: inline-block; background: #0b57d0; color: white; padding: 10px 18px; border-radius: 8px; font-weight: 600; text-decoration: none;">
+                + Create Note
             </a>
         </p>
 
@@ -381,42 +406,39 @@ def notes_list(request: HttpRequest) -> HttpResponse:
         </ul>
     """
 
-    return HttpResponse(
-        html_shell("Notes - list", body)
-    )
+    return HttpResponse(html_shell("Notes — List", body))
 
 
-def note_detail(request: HttpRequest, note_id:int) -> HttpResponse:
+def note_detail(request: HttpRequest, note_id: int) -> HttpResponse:
     note = data.get_note(note_id)
     if note is None:
-        return HttpResponse(html_shell("404 - not found", f"""
-        <h1>Notes not found</h1>
-        <p class="muted">id = {escape(str(note_id))}</p>
-        <p class="muted">
-            <a href="{escape(reverse("notes_list"))}">Return to notes list</a>
-            </p>
-        """), status=404)
-
+        return HttpResponse(
+            html_shell(
+                "404 — Not Found",
+                f"""
+                <h1>Note Not Found</h1>
+                <p class="muted">id = {escape(str(note_id))}</p>
+                <p><a href="{escape(reverse("notes_list"))}">Return to notes list</a></p>
+                """,
+            ),
+            status=404,
+        )
 
     edit_url = escape(reverse("note_edit", kwargs={"note_id": note_id}))
     delete_url = escape(reverse("note_delete", kwargs={"note_id": note_id}))
     list_url = escape(reverse("notes_list"))
-    body = (
-        f"""
-            <h1>{escape(note['title'])}</h1>
-            <p class="muted">id: {note["id"]} tag: {escape(note["tag"])}  category: {escape(note["category"])}</p>
-            <p>{escape(note['body'])}</p>
-            <p>
-                <a href="{edit_url}">Edit</a>
-            </p>
-            <p>
-                <a href="{delete_url}">Delete</a>
-            </p>
-            <p>
-                <a href="{list_url}">Return to Notes List</a>
-            </p>
-        """
-    )
+
+    body = f"""
+        <h1>{escape(note['title'])}</h1>
+        <p class="muted">ID: {note["id"]} | Tag: {escape(note["tag"])} | Category: {escape(note["category"])}</p>
+        <p style="font-size: 1.1rem; line-height: 1.7; margin: 20px 0;">{escape(note['body'])}</p>
+
+        <div style="display: flex; gap: 12px; margin-top: 24px;">
+            <a href="{edit_url}" style="background: #0b57d0; color: white; padding: 8px 16px; border-radius: 6px; font-weight: 600; text-decoration: none;">Edit Note</a>
+            <a href="{delete_url}" style="background: #dc2626; color: white; padding: 8px 16px; border-radius: 6px; font-weight: 600; text-decoration: none;">Delete Note</a>
+            <a href="{list_url}" class="btn-secondary">Back to List</a>
+        </div>
+    """
     return HttpResponse(html_shell(note["title"], body))
 
 
@@ -428,65 +450,50 @@ def note_create(request: HttpRequest) -> HttpResponse:
         category = request.POST.get("category", "")
 
         if not title.strip():
-            err = "<p style='color:red;'>Title cannot be empty</p>"
+            err = "<p style='color:#dc2626; font-weight:600; margin-bottom:12px;'>Title cannot be empty!</p>"
         else:
             created = data.create_note(
                 title=title,
                 body=note_body,
-                tag = tag or "misc",
-                category = category or "general"
+                tag=tag or "misc",
+                category=category or "general",
             )
-            list_url = escape(reverse("notes_list"))
-            return HttpResponse(
-                f"""
-                    <h1>Note created</h1>
-                    <p>id = {created["id"]}, title={escape(created['title'])}</p>
-                    <p><a href= "{list_url}">Return to list</a></p>
-                """
-            )
+            return redirect("note_detail", note_id=created["id"])
     else:
         err = ""
 
     action = escape(reverse("note_create"))
-    form = (
-        f"""
-        <form method="POST" action="{action}">
-            <h1> New note </h1>
-            {err}
-            {_csrf_field(request)}
-            <p>
-                <label>Title:</label>
-                <p>
-                    <input name="title" required>
-                </p>  
-            </p>
-            <p>
-                <label>Text:</label>
-                <p>
-                    <textarea name="body" rows=4></textarea>
-                </p> 
-            </p>
-            
-            <p>
-                <label>Tag:</label>
-                <p>
-                    <input name="tag">
-                </p> 
-            </p>
-            <p>
-                <label>Category:</label>
-                <p>
-                    <input name="category">
-                </p> 
-            </p>
-            
-             <p>
-                <button type="submit">Create</button>                
-            </p>
-        </form>            
-        """
-    )
-    return HttpResponse(form)
+    list_url = escape(reverse("notes_list"))
+
+    form = f"""
+    <h1>Create New Note</h1>
+    {err}
+    <form method="POST" action="{action}">
+        {_csrf_field(request)}
+        <p>
+            <label>Title *</label>
+            <input type="text" name="title" placeholder="Enter note title..." required>
+        </p>
+        <p>
+            <label>Text</label>
+            <textarea name="body" rows="5" placeholder="Enter note content..."></textarea>
+        </p>
+        <p>
+            <label>Tag</label>
+            <input type="text" name="tag" placeholder="e.g. python, django">
+        </p>
+        <p>
+            <label>Category</label>
+            <input type="text" name="category" placeholder="e.g. backend, frontend">
+        </p>
+        <div style="margin-top: 24px; display: flex; gap: 12px; align-items: center;">
+            <button type="submit">Create Note</button>
+            <a href="{list_url}" class="btn-secondary">Cancel</a>
+        </div>
+    </form>
+    """
+    return HttpResponse(html_shell("Create Note", form))
+
 
 def note_edit(request: HttpRequest, note_id: int) -> HttpResponse:
     note = data.get_note(note_id)
@@ -495,10 +502,10 @@ def note_edit(request: HttpRequest, note_id: int) -> HttpResponse:
             html_shell(
                 "404 — Not Found",
                 f"""
-  <h1>Cannot edit</h1>
-  <p class="muted">Note with id={escape(str(note_id))} does not exist.</p>
-  <p><a href="{escape(reverse("notes_list"))}">Back to list</a></p>
-""",
+                <h1>Cannot Edit</h1>
+                <p class="muted">Note with id={escape(str(note_id))} does not exist.</p>
+                <p><a href="{escape(reverse("notes_list"))}">Back to list</a></p>
+                """,
             ),
             status=404,
         )
@@ -510,7 +517,7 @@ def note_edit(request: HttpRequest, note_id: int) -> HttpResponse:
         category = request.POST.get("category", "")
 
         if not title.strip():
-            err = '<p class="muted" style="color:#b00020;">Title cannot be empty.</p>'
+            err = '<p style="color:#dc2626; font-weight:600; margin-bottom:12px;">Title cannot be empty!</p>'
             note = {
                 **note,
                 "title": title,
@@ -527,7 +534,6 @@ def note_edit(request: HttpRequest, note_id: int) -> HttpResponse:
                 category=category or "general",
             )
             return redirect("note_detail", note_id=note_id)
-
     else:
         err = ""
 
@@ -535,22 +541,36 @@ def note_edit(request: HttpRequest, note_id: int) -> HttpResponse:
     body_e = escape(note["body"])
     tag_e = escape(note["tag"])
     category_e = escape(note["category"])
+    action_url = escape(reverse("note_edit", kwargs={"note_id": note_id}))
+    detail_url = escape(reverse("note_detail", kwargs={"note_id": note_id}))
 
     form = f"""
-  <h1>Edit Note</h1>
-  {err}
-  <form method="post" action="{escape(reverse("note_edit", kwargs={"note_id": note_id}))}">
-    {_csrf_field(request)}
-    <label>Title<br /><input type="text" name="title" value="{title_e}" required /></label>
-    <label>Text<br /><textarea name="body" rows="6">{body_e}</textarea></label>
-    <label>Tag<br /><input type="text" name="tag" value="{tag_e}" /></label>
-    <label>Category<br /><input type="text" name="category" value="{category_e}" /></label>
-    <p style="margin-top:1rem;">
-      <button type="submit">Save</button>
-      <a class="muted" href="{escape(reverse("note_detail", kwargs={"note_id": note_id}))}">Cancel</a>
-    </p>
-  </form>
-"""
+    <h1>Edit Note</h1>
+    {err}
+    <form method="POST" action="{action_url}">
+        {_csrf_field(request)}
+        <p>
+            <label>Title *</label>
+            <input type="text" name="title" value="{title_e}" required>
+        </p>
+        <p>
+            <label>Text</label>
+            <textarea name="body" rows="6">{body_e}</textarea>
+        </p>
+        <p>
+            <label>Tag</label>
+            <input type="text" name="tag" value="{tag_e}">
+        </p>
+        <p>
+            <label>Category</label>
+            <input type="text" name="category" value="{category_e}">
+        </p>
+        <div style="margin-top: 24px; display: flex; gap: 12px; align-items: center;">
+            <button type="submit">Save Changes</button>
+            <a href="{detail_url}" class="btn-secondary">Cancel</a>
+        </div>
+    </form>
+    """
     return HttpResponse(html_shell("Edit Note", form))
 
 
@@ -561,10 +581,10 @@ def note_delete(request: HttpRequest, note_id: int) -> HttpResponse:
             html_shell(
                 "404 — Not Found",
                 f"""
-  <h1>Cannot delete</h1>
-  <p class="muted">Note with id={escape(str(note_id))} does not exist.</p>
-  <p><a href="{escape(reverse("notes_list"))}">Back to list</a></p>
-""",
+                <h1>Cannot Delete</h1>
+                <p class="muted">Note with id={escape(str(note_id))} does not exist.</p>
+                <p><a href="{escape(reverse("notes_list"))}">Back to list</a></p>
+                """,
             ),
             status=404,
         )
@@ -573,13 +593,26 @@ def note_delete(request: HttpRequest, note_id: int) -> HttpResponse:
         data.delete_note(note_id)
         return redirect("notes_list")
 
+    detail_url = escape(reverse("note_detail", kwargs={"note_id": note_id}))
+    action_url = escape(reverse("note_delete", kwargs={"note_id": note_id}))
+
     body = f"""
-  <h1>Delete Note?</h1>
-  <p>{escape(note["title"])}</p>
-  <form method="post" action="{escape(reverse("note_delete", kwargs={"note_id": note_id}))}">
-    {_csrf_field(request)}
-    <button type="submit">Yes, delete</button>
-    <a class="muted" href="{escape(reverse("note_detail", kwargs={"note_id": note_id}))}">Cancel</a>
-  </form>
-"""
+    <div class="delete-card">
+        <h1>Confirm Deletion</h1>
+        <p>Are you sure you want to permanently delete this note?</p>
+        
+        <div class="note-preview">
+            <strong>{escape(note["title"])}</strong>
+            <p class="muted" style="margin: 4px 0 0 0;">Tag: {escape(note["tag"])} | Category: {escape(note["category"])}</p>
+        </div>
+
+        <form method="POST" action="{action_url}" style="padding:0; border:none; box-shadow:none; background:transparent;">
+            {_csrf_field(request)}
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <button type="submit" class="btn-danger">Yes, Delete Note</button>
+                <a href="{detail_url}" class="btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+    """
     return HttpResponse(html_shell("Delete Note", body))
