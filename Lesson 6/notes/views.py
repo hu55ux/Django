@@ -332,13 +332,14 @@ def notes_list(request: HttpRequest) -> HttpResponse:
     raw_tag = request.GET.get("tag")
     raw_category = request.GET.get("category")
 
-    notes = data.list_notes()
+    all_notes = data.list_notes()
+    notes = all_notes
 
-    if raw_tag:
+    if raw_tag and raw_tag.strip():
         tag_filter = raw_tag.strip().lower()
         notes = [n for n in notes if n["tag"].lower() == tag_filter]
 
-    if raw_category:
+    if raw_category and raw_category.strip():
         category_filter = raw_category.strip().lower()
         notes = [n for n in notes if n["category"].lower() == category_filter]
 
@@ -364,27 +365,43 @@ def notes_list(request: HttpRequest) -> HttpResponse:
     reset_url = escape(reverse("notes_list"))
     create_url = escape(reverse("note_create"))
 
-    tag_checked = "checked" if raw_tag == "python" else ""
-    category_checked = "checked" if raw_category == "backend" else ""
+    all_tags = sorted(list(set(n["tag"] for n in all_notes)))
+    all_categories = sorted(list(set(n["category"] for n in all_notes)))
+
+    tag_options = ['<option value="">-- All Tags --</option>']
+    for t in all_tags:
+        selected = "selected" if raw_tag and raw_tag.strip().lower() == t.lower() else ""
+        tag_options.append(f'<option value="{escape(t)}" {selected}>{escape(t.capitalize())}</option>')
+
+    category_options = ['<option value="">-- All Categories --</option>']
+    for c in all_categories:
+        selected = "selected" if raw_category and raw_category.strip().lower() == c.lower() else ""
+        category_options.append(f'<option value="{escape(c)}" {selected}>{escape(c.capitalize())}</option>')
 
     filters = f"""
         <form method="GET" action="{reset_url}">
 
-            <h3>Filters</h3>
+            <h3 style="margin-top: 0; margin-bottom: 12px;">Filter Notes</h3>
 
-            <label>
-                <input type="checkbox" name="tag" value="python" {tag_checked}>
-                Tag: Python
-            </label>
+            <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 180px;">
+                    <label style="margin-top: 0;">Tag</label>
+                    <select name="tag">
+                        {"".join(tag_options)}
+                    </select>
+                </div>
 
-            <label>
-                <input type="checkbox" name="category" value="backend" {category_checked}>
-                Category: Backend
-            </label>
+                <div style="flex: 1; min-width: 180px;">
+                    <label style="margin-top: 0;">Category</label>
+                    <select name="category">
+                        {"".join(category_options)}
+                    </select>
+                </div>
+            </div>
 
             <p style="margin-top: 16px;">
-                <button type="submit">Filter</button>
-                <a href="{reset_url}" class="btn-secondary" style="margin-left: 8px; font-size: 0.9rem; padding: 8px 14px;">Reset</a>
+                <button type="submit">Apply Filter</button>
+                <a href="{reset_url}" class="btn-secondary" style="margin-left: 8px; font-size: 0.9rem; padding: 9px 16px;">Reset</a>
             </p>
 
         </form>
