@@ -181,10 +181,33 @@ CRUD — Veb tətbiqlərdə verilənlər üzərində aparılan 4 əsas əməliyy
 6.2. KRİTİK DJANGO FUNKSİYALARI VƏ ANLAYIŞLARI (KNOWLEDGE HUB İZAHI)
 ---------------------------------------------------------------------
 
-1. `CSRF Qorunması (Cross-Site Request Forgery)`:
-   - POST formalarında təhlükəsizlik üçün Django hidden token tələb edir.
-   - `get_token(request)` vasitəsilə hidden input generasiya olunur:
-     `<input type='hidden' name='csrfmiddlewaretoken' value='...' />`
+1. `CSRF Qorunması (Cross-Site Request Forgery - Dərin İzah)`:
+   a) **CSRF Hücumu Nədir?**
+      - Zərərli 3-cü tərəf saytı, istifadəçinin brauzerində aktiv olan sessiyadan 
+        (session cookies) istifadə edərək, istifadəçinin xəbəri olmadan bizim sayta 
+        icazəsiz dəyişiklik edən POST/PUT/DELETE sorğuları göndərir.
+
+   b) **Django Necə Qoruyur? (CSRF Middleware)**
+      - Django daxili `CsrfViewMiddleware` vasitəsilə hər bir state-changing (POST, PUT, 
+        PATCH, DELETE) sorğuda gizli bir token göndərilməsini tələb edir.
+      - Django brauzerə `csrftoken` adında xüsusi cookie yerləşdirir və forma daxilindəki 
+        `csrfmiddlewaretoken` dəyərini həmin cookie ilə müqayisə edir. Tokenlər üst-üstə 
+        düşmədikdə `403 Forbidden` xətası qaytarır.
+
+   c) **Token-in Formaya Daxil Edilməsi Üsulları:**
+      - **HTML Template ilə:** Forms daxilində `{% csrf_token %}` teqini yazmaqla.
+      - **Pure Python / View-da (Knowledge Hub):** `django.middleware.csrf.get_token(request)` 
+        funksiyasını çağıraraq gizli input kimi əlavə etmək:
+        `<input type='hidden' name='csrfmiddlewaretoken' value='{get_token(request)}' />`
+
+   d) **İstisnalar və Dekaratorlar:**
+      - `@csrf_exempt`: Çox xüsusi hallarda (məsələn, xarici webhook-lar üçün) CSRF 
+        yoxlamasını müvəqqəti söndürür (ehtiyatlı istifadə edilməlidir!).
+      - `@csrf_protect`: View üçün CSRF yoxlamasını məcburi aktiv edir.
+
+   e) **AJAX / Single Page Apps (SPA):**
+      - JavaScript (Fetch/Axios) vasitəsilə POST sorğusu göndərdikdə `X-CSRFToken` HTTP 
+        header-i daxilində cookie-dəki `csrftoken` göndərilməlidir.
 
 2. `redirect("route_name", **kwargs)`:
    - Forma göndərildikdən (POST) sonra istifadəçini başqa səhifəyə yönləndirir.
