@@ -218,6 +218,29 @@ def fibonacci(limit: int):
         a, b = b, a + b
 
 
+"""
+6.5. KEYWORD-ONLY ARGUMENTS (`*` PARAMETRİ)
+-------------------------------------------
+Funksiya parametr siyahısında tək başınalıq `*` simvolunun yazılması, 
+həmin `*`-dan sonra gələn BÜTÜN arqumentlərin MÜTLƏQ adları ilə (Keyword Arguments) 
+ötürülməsini tələb edir (Mövqeli / Positional arqument kimi ötürməyə icazə vermir).
+
+Məqsədi:
+- Kodu çağırarkən nəyin nə üçün ötürüldüyünü aydın göstərmək (Code Readability).
+- Parametrlərin ardıcıllığını səhv salmaq riskini sıfıra endirmək.
+
+Nümunə:
+def create_note(*, title: str, body: str):
+    return {"title": title, "body": body}
+
+# ❌ SƏHV İSTİFADƏ (TypeError fırladır):
+# create_note("Django", "Body text")
+
+# ✅ DÜZGÜN İSTİFADƏ:
+# create_note(title="Django", body="Body text")
+"""
+
+
 # =============================================================================
 # 7. OOP-NİN ƏSAS SÜTUNLARI VƏ SEHRLİ METODLAR
 # =============================================================================
