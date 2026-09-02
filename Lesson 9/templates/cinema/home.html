@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Ana Səhifə - {{ cinema_name }}{% endblock %}
+
+{% block content %}
+<div class="hero-card">
+    <h1>{{ cinema_name }}</h1>
+    <p>{{ welcome_text }}</p>
+    <a href="{% url 'movies_list' %}" class="btn btn-primary">Bütün Filmlərə Bax 🍿</a>
+</div>
+
+<div class="page-header">
+    <h2 class="page-title">Populyar Filmlər</h2>
+    <p class="page-subtitle">Hazırda nümayişdə olan ən çox baxılan ekran əsərləri</p>
+</div>
+
+<div class="movies-grid">
+    {% for movie in featured_movies %}
+        <div class="movie-card">
+            <div>
+                <div class="card-header">
+                    <h3 class="movie-title">{{ movie.title }}</h3>
+                    <span class="badge badge-genre">{{ movie.genre }}</span>
+                </div>
+                
+                <div class="movie-meta">
+                    <span class="meta-item">⏱️ {{ movie.duration }}</span>
+                    <span class="meta-item">🔞 {{ movie.age_limit }}</span>
+                </div>
+                
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
+                    {{ movie.description|truncatewords:15 }}
+                </p>
+            </div>
+
+            <div class="card-actions">
+                <div>
+                    {% if movie.available_seats > 0 %}
+                        <span class="badge badge-available">🪑 {{ movie.available_seats }} yer var</span>
+                    {% else %}
+                        <span class="badge badge-soldout">❌ SOLD OUT</span>
+                    {% endif %}
+                </div>
+                
+                <a href="{% url 'movie_detail' movie.id %}" class="btn btn-secondary">Ətraflı &rarr;</a>
+            </div>
+        </div>
+    {% empty %}
+        <div class="empty-state">
+            <p>Hələ ki nümayiş olunan film yoxdur.</p>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

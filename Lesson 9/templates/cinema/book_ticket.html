@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Bilet Bron Et - {{ movie.title }}{% endblock %}
+
+{% block content %}
+<div class="form-card">
+    <div style="margin-bottom: 1.5rem;">
+        <span class="badge badge-genre">{{ movie.genre }}</span>
+        <h2 style="font-size: 1.75rem; font-weight: 800; margin-top: 0.5rem; margin-bottom: 0.5rem;">
+            Bilet Bron Et: {{ movie.title }}
+        </h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+            Mövcud boş yerlərin sayısı: 
+            {% if movie.available_seats > 0 %}
+                <span class="badge badge-available">🪑 {{ movie.available_seats }} yer</span>
+            {% else %}
+                <span class="badge badge-soldout">❌ SOLD OUT</span>
+            {% endif %}
+        </p>
+    </div>
+
+    {% if form.non_field_errors %}
+        <div class="alert alert-error">
+            {% for error in form.non_field_errors %}
+                <div>⚠️ <strong>Xəta:</strong> {{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if movie.available_seats > 0 %}
+        <form method="POST" action="{% url 'book_ticket' movie.id %}" novalidate>
+            {% csrf_token %}
+
+            <div class="form-group">
+                {{ form.customer_name.label_tag }}
+                {{ form.customer_name }}
+                {% if form.customer_name.errors %}
+                    <div style="color: #ef4444; font-size: 0.875rem; margin-top: 0.35rem;">
+                        {% for error in form.customer_name.errors %}
+                            <div>⚠️ {{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.ticket_count.label_tag }}
+                {{ form.ticket_count }}
+                {% if form.ticket_count.errors %}
+                    <div style="color: #ef4444; font-size: 0.875rem; margin-top: 0.35rem;">
+                        {% for error in form.ticket_count.errors %}
+                            <div>⚠️ {{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button type="submit" class="btn btn-primary" style="flex: 1; padding: 0.85rem;">
+                    🎟️ Book
+                </button>
+                <a href="{% url 'movie_detail' movie.id %}" class="btn btn-secondary" style="padding: 0.85rem 1.25rem;">
+                    Ləğv Et
+                </a>
+            </div>
+        </form>
+    {% else %}
+        <div class="alert alert-error">
+            <span>Bu film üçün bütün biletlər satılmışdır. Bron etmək mümkün deyil.</span>
+        </div>
+        <a href="{% url 'movies_list' %}" class="btn btn-secondary" style="width: 100%; text-align: center;">Filmlərə Qayıt</a>
+    {% endif %}
+</div>
+{% endblock %}

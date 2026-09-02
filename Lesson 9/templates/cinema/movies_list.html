@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Filmlərin Siyahısı - CineMagic{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Filmlərin Siyahısı</h1>
+    <p class="page-subtitle">Bütün nümayişləri araşdırın və istədiyiniz filmi süzgəcdən keçirin</p>
+</div>
+
+<!-- Ultra-Interactive Premium Filter Card -->
+<div class="filter-card">
+    <form method="GET" action="{% url 'movies_list' %}" id="filterForm">
+        {{ filter_form.genre }}
+
+        <div class="filter-top-row">
+            <div class="filter-section-title">
+                <span>🎭</span>
+                <span>Janr üzrə filtrlə:</span>
+            </div>
+
+            <div class="genre-pills">
+                <button type="button" 
+                        class="genre-pill {% if not selected_genre %}active{% endif %}"
+                        onclick="setGenre('')">
+                    Bütün Janrlar
+                </button>
+                {% for g in genres %}
+                    <button type="button" 
+                            class="genre-pill {% if selected_genre == g %}active{% endif %}"
+                            onclick="setGenre('{{ g }}')">
+                        {{ g }}
+                    </button>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="filter-bottom-row">
+            <label class="toggle-switch-wrapper" for="availableToggle">
+                <div class="toggle-switch">
+                    {{ filter_form.available_only }}
+                    <span class="toggle-slider"></span>
+                </div>
+                <span class="toggle-label">Yalnız mövcud yeri olan filmlər</span>
+            </label>
+
+            <div class="filter-status-info">
+                <span class="results-count">🍿 {{ movies|length }} film tapıldı</span>
+
+                {% if selected_genre or available_only %}
+                    <a href="{% url 'movies_list' %}" class="reset-filter-btn">
+                        ✕ Filtri sıfırla
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    function setGenre(genre) {
+        document.getElementById('genreInput').value = genre;
+        document.getElementById('filterForm').submit();
+    }
+</script>
+
+<!-- Movies Grid -->
+{% if movies %}
+    <div class="movies-grid">
+        {% for movie in movies %}
+            <div class="movie-card">
+                <div>
+                    <div class="card-header">
+                        <h3 class="movie-title">{{ movie.title }}</h3>
+                        <span class="badge badge-genre">{{ movie.genre }}</span>
+                    </div>
+
+                    <div class="movie-meta">
+                        <span class="meta-item">⏱️ {{ movie.duration }}</span>
+                        <span class="meta-item">🔞 {{ movie.age_limit }}</span>
+                    </div>
+
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
+                        {{ movie.description|truncatewords:18 }}
+                    </p>
+                </div>
+
+                <div class="card-actions">
+                    <div>
+                        {% if movie.available_seats > 0 %}
+                            <span class="badge badge-available">🪑 {{ movie.available_seats }} yer</span>
+                        {% else %}
+                            <span class="badge badge-soldout">❌ SOLD OUT</span>
+                        {% endif %}
+                    </div>
+
+                    <a href="{% url 'movie_detail' movie.id %}" class="btn btn-secondary">Ətraflı &rarr;</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <h3>Axtarışınıza uyğun heç bir film tapılmadı.</h3>
+        <p style="margin-top: 0.5rem;">Zəhmət olmasa filtri dəyişdirin və ya sıfırlayın.</p>
+        <br>
+        <a href="{% url 'movies_list' %}" class="btn btn-primary">Bütün Filmləri Göstər</a>
+    </div>
+{% endif %}
+{% endblock %}

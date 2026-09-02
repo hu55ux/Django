@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Uğurlu Bron! - CineMagic{% endblock %}
+
+{% block content %}
+<div class="success-card">
+    <div class="success-icon">✓</div>
+    <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; color: #ffffff;">
+        Biletiniz Uğurla Bron Olundu!
+    </h1>
+    <p style="color: var(--text-muted); font-size: 1rem;">
+        Bron əməliyyatınız sistemdə qeydə alındı və yeriniz təsdiqləndi.
+    </p>
+
+    <div class="receipt-box">
+        <div class="receipt-row">
+            <span class="receipt-label">Filmin Adı:</span>
+            <span class="receipt-value">{{ booking.movie_title }}</span>
+        </div>
+        <div class="receipt-row">
+            <span class="receipt-label">Müştərinin Adı:</span>
+            <span class="receipt-value">{{ booking.customer_name }}</span>
+        </div>
+        <div class="receipt-row">
+            <span class="receipt-label">Bilet Sayı:</span>
+            <span class="receipt-value">{{ booking.ticket_count }} bilet</span>
+        </div>
+        <div class="receipt-row">
+            <span class="receipt-label">Bron Tarixi:</span>
+            <span class="receipt-value">{{ booking.created_at|date:"d.m.Y H:i" }}</span>
+        </div>
+        <div class="receipt-row">
+            <span class="receipt-label">Qalan Boş Yerlər:</span>
+            <span class="receipt-value" style="color: var(--success-color);">{{ movie.available_seats }} yer</span>
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+        <a href="{% url 'movies_list' %}" class="btn btn-secondary">Bütün Filmlərə Qayıt</a>
+        <a href="{% url 'bookings_list' %}" class="btn btn-primary">Bütün Bronlara Bax 📋</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Bütün Bronlar - CineMagic{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Bilet Bronları Tarixçəsi</h1>
+    <p class="page-subtitle">Sistem vasitəsilə həyata keçirilmiş bütün bilet bronlarının siyahısı</p>
+</div>
+
+{% if bookings %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th># ID</th>
+                    <th>Filmin Adı</th>
+                    <th>Müştərinin Adı</th>
+                    <th>Bilet Sayı</th>
+                    <th>Bron Tarixi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for b in bookings %}
+                    <tr>
+                        <td><strong>#{{ b.id }}</strong></td>
+                        <td style="font-weight: 600; color: #ffffff;">{{ b.movie_title }}</td>
+                        <td>{{ b.customer_name }}</td>
+                        <td>
+                            <span class="badge badge-genre">{{ b.ticket_count }} bilet</span>
+                        </td>
+                        <td style="color: var(--text-muted);">{{ b.created_at|date:"d.m.Y H:i" }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="empty-state" style="background: var(--bg-card); border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">🎟️</div>
+        <h3>Hələ ki heç bir bilet bron edilməyib.</h3>
+        <p style="margin-top: 0.5rem; margin-bottom: 1.5rem;">Filmlərin siyahısına keçərək ilk biletinizi bron edin.</p>
+        <a href="{% url 'movies_list' %}" class="btn btn-primary">Filmlərin Siyahısına Keç</a>
+    </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}{{ movie.title }} - CineMagic{% endblock %}
+
+{% block content %}
+<div class="detail-card">
+    <div class="detail-header">
+        <div>
+            <span class="badge badge-genre" style="margin-bottom: 0.5rem; display: inline-block;">{{ movie.genre }}</span>
+            <h1 class="page-title">{{ movie.title }}</h1>
+            <div class="movie-meta" style="margin-bottom: 0;">
+                <span class="meta-item">⏱️ {{ movie.duration }}</span>
+                <span class="meta-item">🔞 Yaş məhdudiyyəti: {{ movie.age_limit }}</span>
+            </div>
+        </div>
+
+        <div>
+            {% if movie.available_seats > 0 %}
+                <span class="badge badge-available" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+                    🪑 Boş yerlər: {{ movie.available_seats }}
+                </span>
+            {% else %}
+                <span class="badge badge-soldout" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+                    ❌ SOLD OUT
+                </span>
+            {% endif %}
+        </div>
+    </div>
+
+    <h3>Film haqqında:</h3>
+    <p class="detail-description">
+        {{ movie.description }}
+    </p>
+
+    <div style="display: flex; gap: 1rem; align-items: center; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+        {% if movie.available_seats > 0 %}
+            <a href="{% url 'book_ticket' movie.id %}" class="btn btn-primary" style="padding: 0.8rem 2rem; font-size: 1.05rem;">
+                🎟️ Book ticket
+            </a>
+        {% else %}
+            <button type="button" class="btn btn-disabled" style="padding: 0.8rem 2rem; font-size: 1.05rem;" disabled>
+                ❌ Book ticket (SOLD OUT)
+            </button>
+        {% endif %}
+
+        <a href="{% url 'movies_list' %}" class="btn btn-secondary">&larr; Filmlərin siyahısına qayıt</a>
+    </div>
+</div>
+{% endblock %}

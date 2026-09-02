@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Movie not found - CineMagic{% endblock %}
+
+{% block content %}
+<div class="detail-card" style="text-align: center; padding: 4rem 2rem;">
+    <div style="font-size: 3.5rem; margin-bottom: 1rem;">🎬❓</div>
+    <h1 class="page-title" style="color: var(--error-color);">Movie not found</h1>
+    <p class="page-subtitle" style="margin-bottom: 2rem;">
+        Axtardığınız film (ID: {{ movie_id }}) tapılmadı və ya nümayişdən çıxarılıb.
+    </p>
+    <a href="{% url 'movies_list' %}" class="btn btn-primary">&larr; Filmlərin Siyahısına Qayıt</a>
+</div>
+{% endblock %}

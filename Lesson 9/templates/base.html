@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CineMagic - Premium Kinoteatr{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+    <header>
+        <div class="nav-container">
+            <a href="{% url 'home' %}" class="brand-logo">
+                🎬 CineMagic
+            </a>
+
+            <nav>
+                <ul>
+                    <li><a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a></li>
+                    <li><a href="{% url 'movies_list' %}" class="{% if request.resolver_match.url_name == 'movies_list' or request.resolver_match.url_name == 'movie_detail' or request.resolver_match.url_name == 'book_ticket' %}active{% endif %}">Movies</a></li>
+                    <li><a href="{% url 'bookings_list' %}" class="{% if request.resolver_match.url_name == 'bookings_list' %}active{% endif %}">Bookings</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2026 CineMagic Kinoteatrı. Bütün hüquqlar qorunur.</p>
+    </footer>
+
+</body>
+</html>
