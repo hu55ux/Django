@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Register — Product Reviews{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <h2 class="auth-title">Register</h2>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-error">
+                    {% for error in form.non_field_errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="field-error">{{ field.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; font-size: 1rem; margin-top: 0.5rem;">
+                Register
+            </button>
+
+            <div class="auth-footer">
+                Already have an account? <a href="{% url 'login' %}">Log In</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

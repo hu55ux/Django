@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Review — Product Reviews{% endblock %}
+
+{% block content %}
+<div class="form-card">
+    <h2 style="margin-top: 0; margin-bottom: 0.5rem; font-size: 1.6rem;">Edit Your Review</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.95rem;">
+        Product: <strong>{{ review.product.name }}</strong>
+    </p>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="form-group">
+            {{ form.rating.label_tag }}
+            {{ form.rating }}
+            {% if form.rating.errors %}
+                <div class="field-error">{{ form.rating.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            {{ form.text.label_tag }}
+            {{ form.text }}
+            {% if form.text.errors %}
+                <div class="field-error">{{ form.text.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div style="display: flex; gap: 0.8rem; margin-top: 1.5rem;">
+            <button type="submit" class="btn btn-primary" style="flex: 1; justify-content: center;">
+                Save Changes
+            </button>
+            <a href="{% url 'product_detail' review.product.pk %}" class="btn btn-secondary">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

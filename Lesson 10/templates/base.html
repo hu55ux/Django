@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Product Reviews Hub{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+    <!-- Navigation Header -->
+    <nav class="navbar">
+        <a href="{% url 'product_list' %}" class="navbar-brand">
+            🛍️ <span>Product</span>Reviews
+        </a>
+        <ul class="navbar-nav">
+            <li><a href="{% url 'product_list' %}" class="nav-link">Products</a></li>
+            {% if user.is_authenticated %}
+                <li><span class="user-badge">👤 {{ user.username }}</span></li>
+                <li><a href="{% url 'logout' %}" class="nav-link">Logout</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}" class="nav-link">Login</a></li>
+                <li><a href="{% url 'register' %}" class="btn btn-primary">Register</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Flash Alert Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        &copy; 2026 Product Reviews App — Built with Django.
+    </footer>
+
+</body>
+</html>

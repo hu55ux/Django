@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Products Catalog — Product Reviews{% endblock %}
+
+{% block content %}
+<div style="text-align: center; margin-bottom: 2.5rem;">
+    <h1 class="page-title">Explore Products</h1>
+    <p class="page-subtitle">Discover community reviews and share your feedback on your favorite products.</p>
+</div>
+
+<div class="product-grid">
+    {% for product in products %}
+        <div class="product-card">
+            <div>
+                <h3><a href="{% url 'product_detail' product.pk %}">{{ product.name }}</a></h3>
+                <p class="product-desc">{{ product.description|truncatewords:25 }}</p>
+            </div>
+            <div class="product-meta">
+                <div>
+                    {% if product.average_rating %}
+                        <span class="rating-badge">★ {{ product.average_rating }} / 5</span>
+                    {% else %}
+                        <span style="font-size: 0.85rem; color: var(--text-secondary);">No reviews yet</span>
+                    {% endif %}
+                    <span style="font-size: 0.85rem; color: var(--text-secondary); margin-left: 0.5rem;">
+                        ({{ product.reviews.count }} review{% if product.reviews.count != 1 %}s{% endif %})
+                    </span>
+                </div>
+                <a href="{% url 'product_detail' product.pk %}" class="btn btn-primary">
+                    View Details &rarr;
+                </a>
+            </div>
+        </div>
+    {% empty %}
+        <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; background: #fff; border-radius: var(--radius-lg); border: 1px dashed var(--border-color);">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">📦</div>
+            <h3>No products found</h3>
+            <p style="color: var(--text-secondary);">Products will appear here once added by admin.</p>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
