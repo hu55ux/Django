@@ -222,3 +222,46 @@ class TicketAdmin(admin.ModelAdmin):
   ```bash
   python manage.py test
   ```
+
+---
+
+## 8. Movie Watchlist və Şəxsi Tətbiqlər Üçün Əlavə Qaydalar (Lesson 11 Best Practices)
+
+1. **Məlumatların Təhlükəsizliyi və Şəxsi Avtorizasiya (Data Isolation / Ownership Authorization):**
+   - İstifadəçilər yalnız öz məlumatlarına (`owner=request.user`) daxil ola bilməlidirlər.
+   - Siyahı view-da: `Movie.objects.filter(owner=request.user)`.
+   - Redaktə və silmə view-larında obyekt əldə edilərkən sahibi mütləq yoxlanılmalıdır:
+     `get_object_or_404(Movie, pk=pk, owner=request.user)`.
+   - Başqa istifadəçinin obyekt id-si ilə müraciət edildikdə avtomatik `404 Not Found` qaytarılır, bu da icazəsiz məlumat sızmasının və dəyişdirilməsinin qarşısını alır.
+
+2. **Genişləndirilmiş Admin Paneli Konfiqurasiyası (`admin.py`):**
+   - Qruplaşdırılmış form sahələri üçün `fieldsets` istifadə olunmalıdır.
+   - `search_fields`-də xarici açarlar `owner__username`, `owner__email` şəklində sorğulanmalıdır.
+   - Nümunə:
+     ```python
+     @admin.register(Movie)
+     class MovieAdmin(admin.ModelAdmin):
+         list_display = ('id', 'title', 'genre', 'release_year', 'status', 'rating', 'owner', 'created_at')
+         list_filter = ('status', 'genre', 'created_at')
+         search_fields = ('title', 'genre', 'owner__username', 'owner__email')
+         ordering = ('-created_at',)
+         readonly_fields = ('created_at',)
+         fieldsets = (
+             ('Film Məlumatları', {'fields': ('title', 'genre', 'release_year', 'owner')}),
+             ('Status və Qiymət', {'fields': ('status', 'rating')}),
+             ('Tarix Məlumatları', {'fields': ('created_at',)}),
+         )
+     ```
+
+3. **Filtrləmə və Aqreqasiya (Filtering & Aggregation in Views):**
+   - URL parametrləri (`request.GET.get('status')`, `request.GET.get('genre')`, `request.GET.get('q')`) vasitəsilə dinamiq ORM filtrləri tətbiq olunmalıdır.
+   - Statistik göstəricilər üçün Django-nun `Avg`, `Count` funksiyaları istifadə olunur:
+     `all_user_movies.aggregate(Avg('rating'))['rating__avg']`.
+
+4. **Verilənlər Bazasının Avtomatik Doldurulması (`seed.py`):**
+   - Layihəni dərhal sınaqdan keçirmək üçün `seed.py` faylı vasitəsilə `DJANGO_SETTINGS_MODULE` mühit dəyişəni təyin edilir və hazır istifadəçi/data yaradılır.
+
+5. **Avtorizasiya və Giriş Hüquqlarının Unit Testləri (`tests.py`):**
+   - Qorunan səhifələrə anonim daxil olmaq istədikdə `@login_required` tərəfindən `/login/?next=...` səhifəsinə yönləndirmə test edilməlidir.
+   - İstifadəçinin başqa istifadəçiyə aid filmi redaktə etməyə və ya silməyə cəhd etdikdə `404` status kodu aldığını təsdiq edən testlər yazılmalıdır.
+

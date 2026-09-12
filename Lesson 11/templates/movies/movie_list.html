@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block title %}Mənim Filmlərim{% endblock %}
+
+{% block content %}
+<!-- Top Header & Action -->
+<div class="row mb-4 align-items-center">
+    <div class="col-md-7">
+        <h2 class="fw-extrabold mb-1 text-white d-flex align-items-center gap-2">
+            <i class="fa-solid fa-clapperboard text-warning fs-3"></i> Mənim Film Siyahım
+        </h2>
+        <p class="text-muted mb-0 fs-6">İzləmək istədiyiniz, baxdığınız və artıq tamamladığınız filmləri şəxsi kolleksiyanızda idarə edin.</p>
+    </div>
+    <div class="col-md-5 text-md-end mt-3 mt-md-0">
+        <a href="{% url 'movie_create' %}" class="btn btn-gradient px-4 py-2.5">
+            <i class="fa-solid fa-plus me-1"></i> Yeni Film Əlavə Et
+        </a>
+    </div>
+</div>
+
+<!-- Stats Counter Cards Grid -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="stat-card d-flex align-items-center gap-3">
+            <div class="stat-icon bg-primary bg-opacity-25 text-primary">
+                <i class="fa-solid fa-layer-group"></i>
+            </div>
+            <div>
+                <h4 class="fw-bold text-white mb-0">{{ stats.total }}</h4>
+                <small class="text-muted fw-medium">Ümumi Filmlər</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card d-flex align-items-center gap-3">
+            <div class="stat-icon bg-info bg-opacity-25 text-info">
+                <i class="fa-solid fa-bookmark"></i>
+            </div>
+            <div>
+                <h4 class="fw-bold text-white mb-0">{{ stats.want_to_watch }}</h4>
+                <small class="text-muted fw-medium">Baxmaq istəyirəm</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card d-flex align-items-center gap-3">
+            <div class="stat-icon bg-warning bg-opacity-25 text-warning">
+                <i class="fa-solid fa-circle-play"></i>
+            </div>
+            <div>
+                <h4 class="fw-bold text-white mb-0">{{ stats.watching }}</h4>
+                <small class="text-muted fw-medium">Baxıram</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card d-flex align-items-center gap-3">
+            <div class="stat-icon bg-success bg-opacity-25 text-success">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div>
+                <h4 class="fw-bold text-white mb-0">{{ stats.watched }}</h4>
+                <small class="text-muted fw-medium">Baxmışam</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters & Search Section -->
+<div class="filter-card p-3 p-md-4 mb-4">
+    <form method="get" action="{% url 'movie_list' %}" class="row g-3 align-items-end">
+        <!-- Search Query -->
+        <div class="col-12 col-md-4">
+            <label class="form-label text-muted small fw-semibold">Axtarış</label>
+            <div class="input-group">
+                <span class="input-group-text bg-dark border-secondary text-muted">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </span>
+                <input type="text" name="q" value="{{ search_query }}" class="form-control" placeholder="Film adı daxil edin...">
+            </div>
+        </div>
+
+        <!-- Status Filter -->
+        <div class="col-6 col-md-3">
+            <label class="form-label text-muted small fw-semibold">Statusa görə filtr</label>
+            <select name="status" class="form-select">
+                <option value="">Bütün statuslar</option>
+                {% for key, label in status_choices %}
+                    <option value="{{ key }}" {% if selected_status == key %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Genre Filter -->
+        <div class="col-6 col-md-3">
+            <label class="form-label text-muted small fw-semibold">Janra görə filtr</label>
+            <select name="genre" class="form-select">
+                <option value="">Bütün janrlar</option>
+                {% for key, label in genre_choices %}
+                    <option value="{{ key }}" {% if selected_genre == key %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Submit & Reset -->
+        <div class="col-12 col-md-2 d-flex gap-2">
+            <button type="submit" class="btn btn-gradient w-100 py-2.5">
+                <i class="fa-solid fa-filter me-1"></i> Filtr
+            </button>
+            {% if selected_status or selected_genre or search_query %}
+                <a href="{% url 'movie_list' %}" class="btn btn-outline-custom text-nowrap px-3 py-2.5" title="Sıfırla">
+                    <i class="fa-solid fa-rotate-left"></i>
+                </a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<!-- Movies Grid -->
+{% if movies %}
+    <div class="row g-4">
+        {% for movie in movies %}
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="movie-card">
+                    <div class="movie-card-header d-flex justify-content-between align-items-start">
+                        <div>
+                            <span class="badge bg-secondary bg-opacity-40 text-light border border-secondary mb-2 px-2.5 py-1">
+                                <i class="fa-solid fa-masks-theater me-1 text-info"></i> {{ movie.get_genre_display }}
+                            </span>
+                            <h5 class="fw-bold text-white mb-1">{{ movie.title }}</h5>
+                            <small class="text-muted fw-medium">
+                                <i class="fa-regular fa-calendar me-1"></i> {{ movie.release_year }}
+                            </small>
+                        </div>
+                        <div class="rating-badge ms-2" title="Şəxsi Qiymət">
+                            <i class="fa-solid fa-star"></i> {{ movie.rating }}/10
+                        </div>
+                    </div>
+
+                    <div class="movie-card-body mt-3">
+                        <div class="d-flex align-items-center justify-content-between border-top border-secondary pt-3 mt-2">
+                            <div>
+                                {% if movie.status == 'want_to_watch' %}
+                                    <span class="badge-status badge-want_to_watch">
+                                        <i class="fa-solid fa-bookmark"></i> Baxmaq istəyirəm
+                                    </span>
+                                {% elif movie.status == 'watching' %}
+                                    <span class="badge-status badge-watching">
+                                        <span class="pulse-dot me-1"></span> Baxıram
+                                    </span>
+                                {% else %}
+                                    <span class="badge-status badge-watched">
+                                        <i class="fa-solid fa-circle-check"></i> Baxmışam
+                                    </span>
+                                {% endif %}
+                            </div>
+                            <small class="text-muted" title="Əlavə olunma tarixi">
+                                {{ movie.created_at|date:"d.m.Y" }}
+                            </small>
+                        </div>
+
+                        <!-- Ownership Control Buttons -->
+                        <div class="d-flex gap-2 mt-3 pt-3 border-top border-secondary">
+                            <a href="{% url 'movie_update' movie.pk %}" class="btn btn-sm btn-outline-warning w-50 py-2 d-flex align-items-center justify-content-center gap-1 fw-semibold">
+                                <i class="fa-solid fa-pen-to-square"></i> Redaktə
+                            </a>
+                            <a href="{% url 'movie_delete' movie.pk %}" class="btn btn-sm btn-outline-danger w-50 py-2 d-flex align-items-center justify-content-center gap-1 fw-semibold">
+                                <i class="fa-solid fa-trash-can"></i> Sil
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <!-- Empty State -->
+    <div class="empty-state">
+        <i class="fa-solid fa-film"></i>
+        <h4 class="fw-bold text-white mt-2">Film Tapılmadı</h4>
+        <p class="text-muted mb-4 max-w-md mx-auto">
+            {% if selected_status or selected_genre or search_query %}
+                Axtardığınız meyarlara uyğun film tapılmadı. Filtrləri sıfırlayaraq yenidən cəhd edin.
+            {% else %}
+                Siz hələ heç bir film daxil etməmisiniz. Şəxsi film siyahınızı yaradın!
+            {% endif %}
+        </p>
+        {% if selected_status or selected_genre or search_query %}
+            <a href="{% url 'movie_list' %}" class="btn btn-outline-custom me-2 px-4 py-2">Filtrləri sıfırla</a>
+        {% endif %}
+        <a href="{% url 'movie_create' %}" class="btn btn-gradient px-4 py-2">
+            <i class="fa-solid fa-plus me-1"></i> Yeni Film Əlavə Et
+        </a>
+    </div>
+{% endif %}
+
+{% endblock %}
